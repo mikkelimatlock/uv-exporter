@@ -53,16 +53,11 @@ print("height/width: " + str(_outh) + ' ' + str(_outw))
 
 #print(_outfile)
 def main():
-    group_count = 0
-    group_starts_f = []
-    group_starts_s = []
 
     with open(_sourcefile, 'r') as source_file:
         for line in source_file:
+            line.rstrip()
             line_split = re.split(r' ', line)
-            if line_split[0] == 'g':
-                group_starts_f.append(len(faces))
-                group_count += 1
             if line_split[0] == 'vt':
                 new_vertex = Vertex(float(line_split[1]) * _outw, float(line_split[2]) * _outh)
                 vertices.append(new_vertex)
@@ -74,39 +69,27 @@ def main():
                     if vertex_index[1] != '':
                         current_face.append(int(vertex_index[1]))
                 faces.append(current_face)
-        print('Groups: ' + str(group_count))
-        for group in range(group_count):
-            if group == group_count - 1:
-                face_ceiling = len(faces)
-            else:
-                face_ceiling = group_starts_f[group+1]
-            group_starts_s.append(len(sides))
-            for fi in range(group_starts_f[group], face_ceiling):
-                current_face = faces[fi]
-                for i in range(len(current_face)-1):
-                    current_side = [current_face[i], current_face[i+1]]
-                    sides.append(current_side)
-                current_side = [current_face[len(current_face)-1], current_face[0]]
+        #print('vertex count:')
+        #print(len(vertices))
+        #print("Faces:")
+        #print(faces)
+        for current_face in faces:
+            for i in range(len(current_face)-1):
+                current_side = [current_face[i], current_face[i+1]]
                 sides.append(current_side)
-        print(group_starts_s)
-        for group in range(group_count):
-            if group == group_count - 1:
-                side_ceiling = len(sides)
-            else:
-                side_ceiling = group_starts_s[group+1]
-            print("Processing group " + str(group) + ' of ' + _sourcefile + '...')
-            print(str(len(vertices)) + ' vertices, ' + str(len(sides)) + ' sides, ' + str(len(faces)) + ' faces.')
-            img = Image.new('RGBA', (_outw, _outh))
-            colour = (125,255,23)
-            draw = ImageDraw.Draw(img)
-            for si in range(group_starts_s[group], side_ceiling):
-                x_st = vertices[sides[si][0]-1].x
-                y_st = vertices[sides[si][0]-1].y
-                x_en = vertices[sides[si][1]-1].x
-                y_en = vertices[sides[si][1]-1].y
-                draw.line((x_st, y_st, x_en, y_en), fill=colour, width=_width)
-            del draw
-            img.save(_outfile + '_' + str(group) + '.png','PNG')
+            current_side = [current_face[len(current_face)-1], current_face[0]]
+            sides.append(current_side)
+        #print('Sides:')
+        #print(sides)
+        print("Processing " + _sourcefile + '...')
+        print(str(len(vertices)) + ' vertices, ' + str(len(sides)) + ' sides, ' + str(len(faces)) + ' faces.')
+        img = Image.new('RGBA', (_outw, _outh))
+        colour = (125,255,23)
+        draw = ImageDraw.Draw(img)
+        for side in sides:
+            draw.line((vertices[side[0]-1].x, vertices[side[0]-1].y, vertices[side[1]-1].x, vertices[side[1]-1].y), fill=colour, width=_width)
+        del draw
+        img.save(_outfile + '.png','PNG')
 
 ##########
 main()
