@@ -64,7 +64,17 @@ def main():
                 group_starts_f.append(len(faces))
                 group_count += 1
             if line_split[0] == 'vt':
-                new_vertex = Vertex(float(line_split[1]) * _outw, float(line_split[2]) * _outh)
+                current_vertex_x = float(line_split[1])
+                current_vertex_y = float(line_split[2])
+                while current_vertex_x < 0:
+                    current_vertex_x += 1.0
+                while current_vertex_x > 1:
+                    current_vertex_x -= 1.0
+                while current_vertex_y < 0:
+                    current_vertex_y += 1.0
+                while current_vertex_y > 1:
+                    current_vertex_y -= 1.0
+                new_vertex = Vertex(current_vertex_x * _outw, current_vertex_y * _outh)
                 vertices.append(new_vertex)
             elif line_split[0] == 'f':
                 line_split.remove('f')
